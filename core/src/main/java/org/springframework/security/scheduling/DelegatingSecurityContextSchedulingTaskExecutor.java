@@ -15,19 +15,17 @@
  */
 package org.springframework.security.scheduling;
 
-import java.util.concurrent.Callable;
-
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.SchedulingTaskExecutor;
-import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
-import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 
+import java.util.concurrent.Callable;
+
 /**
  * An {@link SchedulingTaskExecutor} which wraps each {@link Runnable} in a
- * {@link DelegatingSecurityContextRunnable} and each {@link Callable} in a
- * {@link DelegatingSecurityContextCallable}.
+ * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and each {@link Callable} in a
+ * {@link org.springframework.util.concurrent.DelegatingContextCallable}.
  *
  * @author Rob Winch
  * @since 3.2
@@ -42,8 +40,8 @@ public class DelegatingSecurityContextSchedulingTaskExecutor extends
 	 * @param delegateSchedulingTaskExecutor the {@link SchedulingTaskExecutor} to
 	 * delegate to. Cannot be null.
 	 * @param securityContext the {@link SecurityContext} to use for each
-	 * {@link DelegatingSecurityContextRunnable} and
-	 * {@link DelegatingSecurityContextCallable}
+	 * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and
+	 * {@link org.springframework.util.concurrent.DelegatingContextCallable}
 	 */
 	public DelegatingSecurityContextSchedulingTaskExecutor(
 			SchedulingTaskExecutor delegateSchedulingTaskExecutor,

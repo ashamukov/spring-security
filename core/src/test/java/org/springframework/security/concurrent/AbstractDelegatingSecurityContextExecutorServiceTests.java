@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.util.concurrent.DelegatingContextExecutorService;
 
 /**
  * Abstract class for testing {@link DelegatingSecurityContextExecutorService} which
@@ -46,7 +47,7 @@ public abstract class AbstractDelegatingSecurityContextExecutorServiceTests exte
 	@Mock
 	private Object resultArg;
 
-	protected DelegatingSecurityContextExecutorService executor;
+	protected DelegatingContextExecutorService executor;
 
 	@Before
 	public final void setUpExecutorService() {
@@ -167,5 +168,5 @@ public abstract class AbstractDelegatingSecurityContextExecutorServiceTests exte
 		assertThat(result).isEqualTo(exectedResult);
 	}
 
-	protected abstract DelegatingSecurityContextExecutorService create();
+	protected abstract DelegatingContextExecutorService create();
 }

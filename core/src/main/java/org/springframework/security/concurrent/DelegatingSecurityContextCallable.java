@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.Assert;
+import org.springframework.util.concurrent.DelegatingContextCallable;
 
 /**
  * <p>
@@ -35,22 +35,7 @@ import org.springframework.util.Assert;
  * @author Rob Winch
  * @since 3.2
  */
-public final class DelegatingSecurityContextCallable<V> implements Callable<V> {
-
-	private final Callable<V> delegate;
-
-
-	/**
-	 * The {@link SecurityContext} that the delegate {@link Callable} will be
-	 * ran as.
-	 */
-	private final SecurityContext delegateSecurityContext;
-
-	/**
-	 * The {@link SecurityContext} that was on the {@link SecurityContextHolder}
-	 * prior to being set to the delegateSecurityContext.
-	 */
-	private SecurityContext originalSecurityContext;
+public final class DelegatingSecurityContextCallable<V> extends DelegatingContextCallable<SecurityContext, V> {
 
 	/**
 	 * Creates a new {@link DelegatingSecurityContextCallable} with a specific
@@ -62,10 +47,7 @@ public final class DelegatingSecurityContextCallable<V> implements Callable<V> {
 	 */
 	public DelegatingSecurityContextCallable(Callable<V> delegate,
 			SecurityContext securityContext) {
-		Assert.notNull(delegate, "delegate cannot be null");
-		Assert.notNull(securityContext, "securityContext cannot be null");
-		this.delegate = delegate;
-		this.delegateSecurityContext = securityContext;
+		super(delegate, securityContext, SecurityContextOps.INSTANCE);
 	}
 
 	/**
@@ -75,31 +57,7 @@ public final class DelegatingSecurityContextCallable<V> implements Callable<V> {
 	 * {@link SecurityContext}. Cannot be null.
 	 */
 	public DelegatingSecurityContextCallable(Callable<V> delegate) {
-		this(delegate, SecurityContextHolder.getContext());
-	}
-
-	@Override
-	public V call() throws Exception {
-		this.originalSecurityContext = SecurityContextHolder.getContext();
-
-		try {
-			SecurityContextHolder.setContext(delegateSecurityContext);
-			return delegate.call();
-		}
-		finally {
-			SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
-			if (emptyContext.equals(originalSecurityContext)) {
-				SecurityContextHolder.clearContext();
-			} else {
-				SecurityContextHolder.setContext(originalSecurityContext);
-			}
-			this.originalSecurityContext = null;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return delegate.toString();
+		super(delegate, SecurityContextHolder.getContext(), SecurityContextOps.INSTANCE);
 	}
 
 	/**

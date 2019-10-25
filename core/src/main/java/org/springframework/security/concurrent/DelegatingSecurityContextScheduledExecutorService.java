@@ -15,24 +15,23 @@
  */
 package org.springframework.security.concurrent;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.concurrent.DelegatingContextScheduledExecutorService;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * An {@link ScheduledExecutorService} which wraps each {@link Runnable} in a
- * {@link DelegatingSecurityContextRunnable} and each {@link Callable} in a
- * {@link DelegatingSecurityContextCallable}.
+ * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and each {@link Callable} in a
+ * {@link org.springframework.util.concurrent.DelegatingContextCallable}.
  *
  * @author Rob Winch
  * @since 3.2
  */
 public final class DelegatingSecurityContextScheduledExecutorService extends
-		DelegatingSecurityContextExecutorService implements ScheduledExecutorService {
+		DelegatingContextScheduledExecutorService {
 	/**
 	 * Creates a new {@link DelegatingSecurityContextScheduledExecutorService} that uses
 	 * the specified {@link SecurityContext}.
@@ -40,13 +39,13 @@ public final class DelegatingSecurityContextScheduledExecutorService extends
 	 * @param delegateScheduledExecutorService the {@link ScheduledExecutorService} to
 	 * delegate to. Cannot be null.
 	 * @param securityContext the {@link SecurityContext} to use for each
-	 * {@link DelegatingSecurityContextRunnable} and each
-	 * {@link DelegatingSecurityContextCallable}.
+	 * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and each
+	 * {@link org.springframework.util.concurrent.DelegatingContextCallable}.
 	 */
 	public DelegatingSecurityContextScheduledExecutorService(
 			ScheduledExecutorService delegateScheduledExecutorService,
 			SecurityContext securityContext) {
-		super(delegateScheduledExecutorService, securityContext);
+		super(delegateScheduledExecutorService, securityContext, SecurityContextOps.INSTANCE);
 	}
 
 	/**
@@ -58,33 +57,6 @@ public final class DelegatingSecurityContextScheduledExecutorService extends
 	 */
 	public DelegatingSecurityContextScheduledExecutorService(
 			ScheduledExecutorService delegate) {
-		this(delegate, null);
-	}
-
-	public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-		command = wrap(command);
-		return getDelegate().schedule(command, delay, unit);
-	}
-
-	public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay,
-			TimeUnit unit) {
-		callable = wrap(callable);
-		return getDelegate().schedule(callable, delay, unit);
-	}
-
-	public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
-			long initialDelay, long period, TimeUnit unit) {
-		command = wrap(command);
-		return getDelegate().scheduleAtFixedRate(command, initialDelay, period, unit);
-	}
-
-	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
-			long initialDelay, long delay, TimeUnit unit) {
-		command = wrap(command);
-		return getDelegate().scheduleWithFixedDelay(command, initialDelay, delay, unit);
-	}
-
-	private ScheduledExecutorService getDelegate() {
-		return (ScheduledExecutorService) getDelegateExecutor();
+		super(delegate, SecurityContextOps.INSTANCE);
 	}
 }

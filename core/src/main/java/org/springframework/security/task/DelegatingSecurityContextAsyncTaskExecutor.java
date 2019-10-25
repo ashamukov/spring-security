@@ -15,18 +15,16 @@
  */
 package org.springframework.security.task;
 
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.security.core.context.SecurityContext;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
-import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
-import org.springframework.security.core.context.SecurityContext;
-
 /**
  * An {@link AsyncTaskExecutor} which wraps each {@link Runnable} in a
- * {@link DelegatingSecurityContextRunnable} and each {@link Callable} in a
- * {@link DelegatingSecurityContextCallable}.
+ * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and each {@link Callable} in a
+ * {@link org.springframework.util.concurrent.DelegatingContextCallable}.
  *
  * @author Rob Winch
  * @since 3.2
@@ -41,8 +39,8 @@ public class DelegatingSecurityContextAsyncTaskExecutor extends
 	 * @param delegateAsyncTaskExecutor the {@link AsyncTaskExecutor} to delegate to.
 	 * Cannot be null.
 	 * @param securityContext the {@link SecurityContext} to use for each
-	 * {@link DelegatingSecurityContextRunnable} and
-	 * {@link DelegatingSecurityContextCallable}
+	 * {@link org.springframework.util.concurrent.DelegatingContextRunnable} and
+	 * {@link org.springframework.util.concurrent.DelegatingContextCallable}
 	 */
 	public DelegatingSecurityContextAsyncTaskExecutor(
 			AsyncTaskExecutor delegateAsyncTaskExecutor, SecurityContext securityContext) {
