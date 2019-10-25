@@ -133,7 +133,7 @@ public class DelegatingSecurityContextCallableTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void createNullDelegateAndSecurityContext() {
-		DelegatingSecurityContextRunnable.create(null, null);
+		DelegatingSecurityContextCallable.create(null, null);
 	}
 
 	@Test

@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.security.core.context;
+package org.springframework.util.concurrent;
 
-import org.springframework.util.concurrent.ContextOps;
+import java.util.concurrent.Callable;
 
 /**
- * A strategy for storing security context information against a thread.
- *
- * <p>
- * The preferred strategy is loaded by {@link SecurityContextHolder}.
- *
- * @author Ben Alex
+ * A strategy for storing context information against a thread.
  */
-public interface SecurityContextHolderStrategy extends ContextOps<SecurityContext> {
+public interface ContextOps<C> {
 	// ~ Methods
 	// ========================================================================================================
 
@@ -41,7 +36,7 @@ public interface SecurityContextHolderStrategy extends ContextOps<SecurityContex
 	 * @return a context (never <code>null</code> - create a default implementation if
 	 * necessary)
 	 */
-	SecurityContext getContext();
+	C getContext();
 
 	/**
 	 * Sets the current context.
@@ -50,14 +45,20 @@ public interface SecurityContextHolderStrategy extends ContextOps<SecurityContex
 	 * implementations must check if <code>null</code> has been passed and throw an
 	 * <code>IllegalArgumentException</code> in such cases)
 	 */
-	void setContext(SecurityContext context);
+	void setContext(C context);
 
 	/**
-	 * Creates a new, empty context implementation, for use by
-	 * <tt>SecurityContextRepository</tt> implementations, when creating a new context for
-	 * the first time.
+	 * Creates a new, empty context implementation.
 	 *
 	 * @return the empty context.
 	 */
-	SecurityContext createEmptyContext();
+	C createEmptyContext();
+
+	default Runnable wrap(Runnable delegate, C context) {
+		return DelegatingContextRunnable.create(delegate, context, this);
+	}
+
+	default <T> Callable<T> wrap(Callable<T> delegate, C context) {
+		return DelegatingContextCallable.create(delegate, context, this);
+	}
 }

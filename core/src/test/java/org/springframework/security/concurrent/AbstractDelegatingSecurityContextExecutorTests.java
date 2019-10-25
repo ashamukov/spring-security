@@ -22,6 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.util.concurrent.DelegatingContextExecutor;
 
 /**
  * Abstract class for testing {@link DelegatingSecurityContextExecutor} which allows
@@ -38,7 +39,7 @@ public abstract class AbstractDelegatingSecurityContextExecutorTests extends
 	@Mock
 	protected ScheduledExecutorService delegate;
 
-	private DelegatingSecurityContextExecutor executor;
+	private DelegatingContextExecutor executor;
 
 	// --- constructor ---
 
@@ -60,5 +61,5 @@ public abstract class AbstractDelegatingSecurityContextExecutorTests extends
 		return delegate;
 	}
 
-	protected abstract DelegatingSecurityContextExecutor create();
+	protected abstract DelegatingContextExecutor create();
 }

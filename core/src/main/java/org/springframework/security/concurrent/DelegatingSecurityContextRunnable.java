@@ -18,6 +18,7 @@ package org.springframework.security.concurrent;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
+import org.springframework.util.concurrent.DelegatingContextRunnable;
 
 /**
  * <p>
@@ -33,21 +34,7 @@ import org.springframework.util.Assert;
  * @author Rob Winch
  * @since 3.2
  */
-public final class DelegatingSecurityContextRunnable implements Runnable {
-
-	private final Runnable delegate;
-
-	/**
-	 * The {@link SecurityContext} that the delegate {@link Runnable} will be
-	 * ran as.
-	 */
-	private final SecurityContext delegateSecurityContext;
-
-	/**
-	 * The {@link SecurityContext} that was on the {@link SecurityContextHolder}
-	 * prior to being set to the delegateSecurityContext.
-	 */
-	private SecurityContext originalSecurityContext;
+public final class DelegatingSecurityContextRunnable extends DelegatingContextRunnable<SecurityContext> {
 
 	/**
 	 * Creates a new {@link DelegatingSecurityContextRunnable} with a specific
@@ -59,10 +46,7 @@ public final class DelegatingSecurityContextRunnable implements Runnable {
 	 */
 	public DelegatingSecurityContextRunnable(Runnable delegate,
 			SecurityContext securityContext) {
-		Assert.notNull(delegate, "delegate cannot be null");
-		Assert.notNull(securityContext, "securityContext cannot be null");
-		this.delegate = delegate;
-		this.delegateSecurityContext = securityContext;
+		super(delegate, securityContext, SecurityContextOps.INSTANCE);
 	}
 
 	/**
@@ -72,31 +56,7 @@ public final class DelegatingSecurityContextRunnable implements Runnable {
 	 * {@link SecurityContext}. Cannot be null.
 	 */
 	public DelegatingSecurityContextRunnable(Runnable delegate) {
-		this(delegate, SecurityContextHolder.getContext());
-	}
-
-	@Override
-	public void run() {
-		this.originalSecurityContext = SecurityContextHolder.getContext();
-
-		try {
-			SecurityContextHolder.setContext(delegateSecurityContext);
-			delegate.run();
-		}
-		finally {
-			SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
-			if (emptyContext.equals(originalSecurityContext)) {
-				SecurityContextHolder.clearContext();
-			} else {
-				SecurityContextHolder.setContext(originalSecurityContext);
-			}
-			this.originalSecurityContext = null;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return delegate.toString();
+		super(delegate, SecurityContextOps.INSTANCE);
 	}
 
 	/**

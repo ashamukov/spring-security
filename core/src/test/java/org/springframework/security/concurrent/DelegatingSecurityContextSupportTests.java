@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.util.concurrent.AbstractDelegatingContextSupport;
 
 /**
  *
@@ -28,7 +29,7 @@ import org.springframework.security.core.context.SecurityContext;
  */
 public class DelegatingSecurityContextSupportTests extends
 		AbstractDelegatingSecurityContextTestSupport {
-	private AbstractDelegatingSecurityContextSupport support;
+	private AbstractDelegatingContextSupport support;
 
 	@Test
 	public void wrapCallable() throws Exception {
@@ -61,9 +62,9 @@ public class DelegatingSecurityContextSupportTests extends
 	}
 
 	private static class ConcreteDelegatingSecurityContextSupport extends
-			AbstractDelegatingSecurityContextSupport {
+			AbstractDelegatingContextSupport {
 		ConcreteDelegatingSecurityContextSupport(SecurityContext securityContext) {
-			super(securityContext);
+			super(securityContext, SecurityContextOps.INSTANCE);
 		}
 	}
 }
